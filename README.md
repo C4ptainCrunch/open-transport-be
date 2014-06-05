@@ -75,6 +75,7 @@ Static:
 Static:
 
 * GTFS (http://gtfs.ovapi.nl/tec/)
+* http://datahub.io/dataset/tec
 
 ## Available APIs
 None
