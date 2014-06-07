@@ -76,6 +76,7 @@ Static:
 
 * GTFS (http://gtfs.ovapi.nl/tec/)
 * http://datahub.io/dataset/tec
+* http://quentinkaiser.be/?p=133
 
 ## Available APIs
 None
