@@ -1,6 +1,5 @@
 import requests
 from xml.etree import ElementTree
-import time
 from utils import children_to_dict
 
 METRO, BUS, TRAM = 'M', 'B', 'T'
@@ -40,7 +39,7 @@ class Line(object):
     def to_route(self, way):
         wanted_way = way
         if not wanted_way in (1, 2):
-            for key, name in self.terminuses.iteritems():
+            for key, name in self.terminuses.items():
                 if name == wanted_way:
                     way = key
                     break
