@@ -7,6 +7,10 @@ def get_list():
     payload = "{applicationId: 'irtmap'}"
     ret = requests.post(url, data=payload, headers=const.HEADERS)
 
+    irail_url = "http://api.irail.be/stations/?format=json"
+    irail_ret = requests.get(irail_url, headers=const.IRAIL_HEADERS)
+    irail_stations = irail_ret.json()['station']
+
     stations = []
 
     for station in json.loads(ret.json()['d']):
@@ -20,8 +24,16 @@ def get_list():
             'de': station['DescriptionDe']
         }
 
+        corresponding = list(filter(lambda x: x['name'] == name['nl'],irail_stations))
+        if len(corresponding) > 0:
+            real_id = corresponding[0]['id']
+        else:
+            real_id = "UNKNOWN.UNKNOWN.{}".format(id)
+
+
         stations.append({
-            'id': id,
+            'sncb_id': id,
+            'id': real_id,
             'latitude': latitude,
             'longitude': longitude,
             'name': name,
