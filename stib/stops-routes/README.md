@@ -6,6 +6,7 @@
 Download and install https://pypi.python.org/pypi/OWSLib
 
 ```
+from owslib.wms import WebMapService
 wms = WebMapService('http://geoserver.gis.irisnetlab.be/geoserver/wfs', version="1.1.0")
 
 (142503.5170999989, 161513.0, 160195.0, 179610.0, 'EPSG:31370')
@@ -46,3 +47,4 @@ http://geonode.geobru.irisnet.be/en/webservices/#stib a l'air d'être une vraie 
 Avec en vrac comme url potentiellement intéressantes :
 * http://www.bruxellesmobilite.irisnet.be/map/intermodal/?zoom=1&lon=150500&lat=170000&active_layers=switch_villo0,switch_cameras0,switch_alerts0,switch_levels_of_service0,switch_levels_of_service1,switch_levels_of_service2&ref=/
 * http://geonetwork.geobru.irisnet.be/geonetwork/srv/fre/csw?Request=GetRecordById&Service=CSW&Version=2.0.2&elementSetName=full&outputSchema=http://www.isotc211.org/2005/gmd&id=f288e3d2-7e38-40f5-a664-f0e42a499167
+ 

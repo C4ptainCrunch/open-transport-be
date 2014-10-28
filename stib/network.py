@@ -12,7 +12,7 @@ class Agency(object):
 
     def _get_data(self):
         r = requests.get('http://m.stib.be/api/getlinesnew.php')
-        lines = ElementTree.fromstring(r.text)
+        lines = ElementTree.fromstring(r.text.encode("utf-8"))
 
         for line in lines:
             line = children_to_dict(line)
@@ -22,7 +22,8 @@ class Agency(object):
             mode = line['mode'] if line['mode'] else TRAM # Tram 93 returns None
             terminuses = {1: line['destination1'].capitalize(), 2: line['destination2'].capitalize()}
             colors = {'fg': line['fgcolor'], 'bg': line['bgcolor']}
-            self.lines.append(Line(number, mode, terminuses, colors))
+            if not str(number)[0] == "N": #Noctis returns an invalid XML
+                self.lines.append(Line(number, mode, terminuses, colors))
 
     def __repr__(self):
         return "<Agency: {} lines>".format(len(self.lines))
@@ -62,7 +63,7 @@ class Route(object):
         self.stop_points = []
 
         r = requests.get('http://m.stib.be/api/getitinerary.php?line={}&iti={}'.format(self.id, self.way))
-        stop_points = ElementTree.fromstring(r.text)
+        stop_points = ElementTree.fromstring(r.text.encode("utf-8"))
 
         for stop_point in stop_points:
             self.stop_points.append(StopPoint.from_xml(stop_point, self))
