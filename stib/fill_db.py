@@ -13,15 +13,33 @@ def insert_stops(cursor, stops):
 	connection.commit()
 
 
+def insert_lines(cursor, lines):
+	for line in lines:
+		point = ppygis.Point(*line["point"].coords[0])
+		linestring = ppygis.LineString(map(lambda x: ppygis.Point(*x), line["linestring"].coords))
+
+		mode = line['other_id'][-1].upper()
+		line_numer = line['other_id'][:-1]
+		if line_numer.startswith("0"):
+			line_numer = line_numer[1:]
+
+		a = cursor.execute(
+			"INSERT INTO journey_pattern(uid, mode, line_number, start_point, shape) VALUES (%s, %s, %s, %s, %s)",
+			(line["id"], mode, line_numer, point, linestring)
+		)
+
+	connection.commit()
+
+
 
 if __name__ == '__main__':
 	import get_static_data as gsd
 
-	# Connect to an existing spatially enabled database
 	connection = psycopg2.connect(database='nikita')
 	cursor = connection.cursor()
 
 	insert_stops(cursor, gsd.get_stops())
+	insert_lines(cursor, gsd.get_lines())
 
 	cursor.close()
 	connection.close()
