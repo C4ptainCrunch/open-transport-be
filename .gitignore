@@ -2,3 +2,4 @@
 *.pyc
 ve/*
 vendor/node/*
+stib/data/*.geojson

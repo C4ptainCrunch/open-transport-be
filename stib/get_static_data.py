@@ -1,60 +1,37 @@
-from owslib.wms import WebMapService
-from subprocess import check_output
-import requests
-import json
-import random
+import wms_wrapper as ww
 
-def get_lines_bloated():
-	"""Return evaluated (geo)json containing the physical path of stib vehicules"""
-
-	wms = WebMapService('http://geoserver.gis.irisnetlab.be/geoserver/wfs', version="1.1.0")
-	kml = wms.getmap(
-	    layers=['stib_mivb:ACTU_LIGNES_BRUTES'],
-	    srs='EPSG:31370',
-	    # Get the exact, updated bbox from wms['stib_mivb:ACTU_LIGNES_BRUTES'].boundingBox
-	    bbox=(142503.5170999989, 161513.0, 160195.0, 179610.0),
-	    size=(3000, 3000),
-	    format='kml',
-	    transparent=True)
-
-	result = kml.read()
-	rand_id = random.randint(0, 10000)
-	open('/tmp/kml-{}.kml'.format(rand_id), "w").write(result)
-	geojson = check_output([
-		"../vendor/node/bin/node",
-		"../vendor/node/bin/togeojson",
-		"/tmp/kml-{}.kml".format(rand_id)
-	])
-
-	return json.loads(geojson)
-
+from utils import parse_description
 
 def get_stops():
-	"""Return evaluated (geo)json containing every vehicle stop of the stib"""
+	pl = ww.get_placemarks(ww.get_layer('stib_mivb:ACTU_STOPS'))
 
-	a = requests.post(
-		"http://www.bruxellesmobilite.irisnet.be/urbis/geoserver/wfs",
-		data="""<wfs:GetFeature xmlns:wfs="http://www.opengis.net/wfs" service="WFS" version="1.0.0" xsi:schemaLocation="http://www.opengis.net/wfs http://schemas.opengis.net/wfs/1.0.0/WFS-transaction.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><wfs:Query typeName="feature:STIB_STOP_GEO" xmlns:feature="http://mobility.irisnet.be"><ogc:Filter xmlns:ogc="http://www.opengis.net/ogc"><ogc:BBOX><ogc:PropertyName>GEOM</ogc:PropertyName><gml:Box xmlns:gml="http://www.opengis.net/gml" srsName="EPSG:31370"><gml:coordinates decimal="." cs="," ts=" ">047033.95140118,063110.89946181 254971.46727622,270455.74748485</gml:coordinates></gml:Box></ogc:BBOX></ogc:Filter></wfs:Query></wfs:GetFeature>"""
-	)
-	rand_id = random.randint(0, 10000)
-	open("/tmp/points-{}".format(rand_id), "w").write(a.text)
-	check_output([
-		"ogr2ogr", "-f", "GeoJSON",
-		"-t_srs", "epsg:4326",
-		"-s_srs", "epsg:31370",
-		"/tmp/points-{}.json".format(rand_id),
-		"/tmp/points-{}".format(rand_id)
-	])
+	for placemark in pl:
 
-	content = open("/tmp/points-{}.json".format(rand_id)).read()
-	return json.loads(content)
+		info_dict = parse_description(placemark.description)
+
+		yield {
+			"id": placemark.name,
+			"mode":  info_dict["mode"],
+			"stop_id" : info_dict["stop_id"],
+			"name_nl" : info_dict["Alpha_NL"],
+			"name_fr" : info_dict["Alpha_FR"],
+			"slug_fr" : info_dict["DESCR_FR"],
+			"slug_nl" : info_dict["DESCR_NL"],
+			"point": placemark.geometry
+		}
 
 
-if __name__ == '__main__':
-	print "Gathering lines..."
-	open("data/lines.geojson", 'w').write(json.dumps(get_lines()))
+def get_lines():
+	pl = ww.get_placemarks(ww.get_layer('stib_mivb:ACTU_LIGNES_BRUTES'))
 
-	print "Gathering stops..."
-	open("data/stops.geojson", 'w').write(json.dumps(get_stops()))
+	for placemark in pl:
+		info_dict = parse_description(placemark.description)
 
-	print "Done."
+		geoms = list(placemark.geometry.geoms)
+
+		yield {
+			"id": placemark.name,
+			"other_id" : info_dict["NUM_LIGNE"],
+			"point": geoms[0],
+			"linestring": geoms[1]
+		}
