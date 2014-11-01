@@ -20,7 +20,9 @@ CREATE TABLE journey_pattern (
     uid varchar(255),
     mode varchar(255),
     line_number varchar(255),
-    direction varchar(4)
+    direction varchar(4),
+    bg_color varchar(7),
+    fg_color varchar(7)
 );
 
 SELECT AddGeometryColumn('journey_pattern','shape',-1,'LINESTRING',2);

@@ -102,10 +102,10 @@ def find_direction_and_assign_journey(cursor):
 
             journey_id = result[0]
 
-            # Set the direction to this route
+            # Set the direction to this route and set colors
             cursor.execute(
-                "UPDATE journey_pattern SET direction=%s WHERE id=%s",
-                (direction, journey_id)
+                "UPDATE journey_pattern SET direction=%s, bg_color=%s, fg_color=%s WHERE id=%s",
+                (direction, "#"+line.colors["bg"], "#"+line.colors["fg"], journey_id)
             )
 
             # Set the journey_pattern_id and the order of every stop of this journey_pattern
