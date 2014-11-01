@@ -72,6 +72,7 @@ def find_direction_and_assign_journey(cursor):
         direction = 0
         time.sleep(0.1)
         
+        # Find lines without geographic path
         cursor.execute("SELECT COUNT(*) FROM journey_pattern WHERE line_number=%s", (str(line.id),))
         items = cursor.fetchone()[0]
         routes =  (line.to_route(1), line.to_route(2))
@@ -83,6 +84,8 @@ def find_direction_and_assign_journey(cursor):
 
         for route in routes:
             direction += 1
+
+            # Find the closest route starting from the start stop_point of the line
             cursor.execute(
                 """SELECT journey_pattern.id, ST_distance(ST_PointN(journey_pattern.shape,1), stop_point.coord) AS distance
                 FROM journey_pattern, stop_point
@@ -99,10 +102,20 @@ def find_direction_and_assign_journey(cursor):
 
             journey_id = result[0]
 
+            # Set the direction to this route
             cursor.execute(
                 "UPDATE journey_pattern SET direction=%s WHERE id=%s",
                 (direction, journey_id)
             )
+
+            # Set the journey_pattern_id and the order of every stop of this journey_pattern
+            ids = map(lambda x: x.id, route.stop_points)
+
+            for i, stop in enumerate(ids):
+                cursor.execute(
+                    "UPDATE stop_point SET journey_pattern_id=%s, pattern_order=%s WHERE stib_id=%s",
+                    (journey_id, i, stop)
+                )
     
     connection.commit()
 

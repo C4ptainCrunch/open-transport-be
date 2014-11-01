@@ -9,6 +9,7 @@ CREATE TABLE stop_point (
     name_nl varchar(255),
     slug_fr varchar(255),
     slug_nl varchar(255),
+    pattern_order int,
     journey_pattern_id int DEFAULT null
 );
 
