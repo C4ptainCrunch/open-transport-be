@@ -3,7 +3,7 @@ import fastkml
 
 def get_layer(layer_name):
 
-	wms = WebMapService('http://geoserver.gis.irisnetlab.be/geoserver/wfs', version="1.1.0")
+	wms = WebMapService('http://geoserver.gis.irisnetlab.be/geoserver/wfs', version="1.3")
 
 	kml = wms.getmap(
 		layers=[layer_name],

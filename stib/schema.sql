@@ -4,7 +4,7 @@ DROP TABLE journey_pattern;
 CREATE TABLE stop_point (
 	id SERIAL PRIMARY KEY,
 	uid varchar(255),
-	stib_id varchar(255),
+	stib_id int,
 	name_fr varchar(255),
 	name_nl varchar(255),
 	slug_fr varchar(255),

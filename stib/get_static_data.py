@@ -9,10 +9,12 @@ def get_stops():
 
 		info_dict = parse_description(placemark.description)
 
+		stop_id = int(filter(lambda x: x.isdigit(),info_dict["stop_id"]))
+
 		yield {
 			"id": placemark.name,
 			"mode":  info_dict["mode"],
-			"stop_id" : info_dict["stop_id"],
+			"stop_id" : stop_id,
 			"name_nl" : info_dict["Alpha_NL"],
 			"name_fr" : info_dict["Alpha_FR"],
 			"slug_fr" : info_dict["DESCR_FR"],
