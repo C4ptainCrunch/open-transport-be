@@ -8,13 +8,13 @@ def children_to_dict(elem):
     return d
 
 def parse_description(description):
-	info = re.sub('<[^<]+?>', '', description)
-	info_dict = {}
+    info = re.sub('<[^<]+?>', '', description)
+    info_dict = {}
 
-	for line in info.split("\n"):
-		line = line.strip()
-		if ": " in line:
-			split = line.split(": ")
-			info_dict[split[0]] = split[1]
+    for line in info.split("\n"):
+        line = line.strip()
+        if ": " in line:
+            split = line.split(": ")
+            info_dict[split[0]] = split[1]
 
-	return info_dict
+    return info_dict
